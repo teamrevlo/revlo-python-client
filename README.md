@@ -2,6 +2,11 @@
 
 Revlo API Web Client
 
+## Pre-requisites
+```
+Python ≥ 3.5
+```
+
 ## Installation
 
 ```
