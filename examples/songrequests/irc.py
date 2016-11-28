@@ -43,9 +43,9 @@ class Irc:
     self.send("CAP REQ :twitch.tv/tags")
 
     if self.check_login_status(self.sock.recv(1024)):
-      print('Login successful.')
+      print('Log into TwitchIRC successful.')
     else:
-      print("Login Unsuccessful.")
+      print("Log into TwitchIRC Unsuccessful.")
       sys.exit()
 
     self.join(self.config['channel'])

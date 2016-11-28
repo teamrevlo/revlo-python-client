@@ -29,7 +29,7 @@ class RevloClient(object):
       if response.ok:
         break
       elif self._is400(response.status_code):
-        handle_errors(self,response)
+        self.handle_errors(self,response)
       sleep(min(2**i,10))
     if not response.ok:
       self.handle_errors(response)
@@ -42,7 +42,7 @@ class RevloClient(object):
       if response.ok:
         break
       elif self._is400(response.status_code):
-        handle_errors(self,response)
+        self.handle_errors(self,response)
       sleep(min(2**i,10))
     if not response.ok:
       self.handle_errors(response)

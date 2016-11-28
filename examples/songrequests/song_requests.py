@@ -9,7 +9,7 @@ from irc import Irc
 
 LAST_REWARD_REDEEMED_FILENAME = './last_redemption_id.dat'
 
-def request_songs_to_nightbot(songs):
+def request_songs_to_nightbot(twitch, songs):
   if not songs:
     return
   irc = Irc(twitch)
@@ -40,14 +40,18 @@ def scan_song_redemptions(token, reward_id):
     for redemption in redemptions_batch:
       if redemption['reward_id'] == reward_id:
         if redemption['completed']:
-          return results.reverse()
-        elif last_redemption_id >= redemption['reward_id']:
-          return results.reverse()
+          results.reverse()
+          return results
+        elif last_redemption_id >= redemption['redemption_id']:
+          results.reverse()
+          return results
         elif not redemption['refunded']:
-          results.append(redemption['user_input'])
+          results.append(redemption['user_input']['song'])
           last_redemption_id = max(last_redemption_id, redemption['redemption_id'])
           update_last_redemption(last_redemption_id)
-  return results.reverse()
+  results.reverse()
+  print("New songs found:{}".format(results))
+  return results
 
 def main():
   config = ConfigParser()
@@ -59,7 +63,7 @@ def main():
   reward_id = int(revlo['reward_id'])
   while True:
     songs = scan_song_redemptions(token, reward_id)
-    request_songs_to_nightbot(songs)
+    request_songs_to_nightbot(twitch, songs)
     time.sleep(60)
 
 if __name__ == '__main__':
