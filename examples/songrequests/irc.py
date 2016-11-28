@@ -6,6 +6,7 @@ class Irc:
     self.config = config
     self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     self.sock.settimeout(10)
+    self.get_irc_socket_object()
 
   def close():
     self.sock.close()
@@ -19,12 +20,13 @@ class Irc:
 
   def send(self, msg):
     msg += '\r\n'
+    print("Sending message: {}".format(msg))
     ba = bytearray()
     ba.extend(map(ord, msg))
     self.sock.send(ba)
 
   def send_message(self, channel, message):
-    self.send('PRIVMSG {} :{}'.format(channel, message))
+    self.send('PRIVMSG #{} :{}'.format(channel, message))
 
   def get_irc_socket_object(self):
     try:
@@ -52,7 +54,7 @@ class Irc:
     return self.sock
 
   def join(self, channel):
-    self.send('JOIN {}'.format(channel))
+    self.send('JOIN #{}'.format(channel))
 
   def leave(self, channel):
     self.send('PART {}'.format(channel))

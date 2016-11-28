@@ -9,16 +9,12 @@ from irc import Irc
 
 LAST_REWARD_REDEEMED_FILENAME = './last_redemption_id.dat'
 
-def request_songs_to_nightbot(twitch, songs):
+def request_songs_to_nightbot(irc, twitch, songs):
   if not songs:
     return
-  irc = Irc(twitch)
-  sock = irc.get_irc_socket_object()
-  sock.settimeout(8)
   for song in songs:
     irc.send_message(twitch['channel'], '!songs request {}'.format(song))
-    time.sleep(3)
-  irc.leave(twitch['channel'])
+    time.sleep(6)
 
 def get_last_redemption():
   with open(LAST_REWARD_REDEEMED_FILENAME) as f:
@@ -37,18 +33,16 @@ def scan_song_redemptions(token, reward_id):
   results = []
   last_redemption_id = get_last_redemption()
   for redemptions_batch in client.get_redemptions():
+    redemption_ids = []
     for redemption in redemptions_batch:
+      redemption_ids.append(redemption['redemption_id'])
       if redemption['reward_id'] == reward_id:
-        if redemption['completed']:
-          results.reverse()
-          return results
-        elif last_redemption_id >= redemption['redemption_id']:
-          results.reverse()
-          return results
-        elif not redemption['refunded']:
+        if not redemption['refunded'] or not redemption['completed']:
           results.append(redemption['user_input']['song'])
           last_redemption_id = max(last_redemption_id, redemption['redemption_id'])
-          update_last_redemption(last_redemption_id)
+    if last_redemption_id >= max(redemption_ids):
+      break
+  update_last_redemption(last_redemption_id)
   results.reverse()
   print("New songs found:{}".format(results))
   return results
@@ -59,12 +53,20 @@ def main():
   twitch = config['twitch']
   revlo = config['revlo']
 
+  irc = Irc(twitch)
   token = revlo['api_key']
   reward_id = int(revlo['reward_id'])
-  while True:
-    songs = scan_song_redemptions(token, reward_id)
-    request_songs_to_nightbot(twitch, songs)
-    time.sleep(60)
+
+  print("Press Ctrl+C to kill the bot")
+  try:
+    while True:
+      songs = scan_song_redemptions(token, reward_id)
+      request_songs_to_nightbot(irc, twitch, songs)
+      time.sleep(60)
+  except KeyboardInterrupt:
+    print("Leaving channel")
+  finally:
+    irc.leave(twitch['channel'])
 
 if __name__ == '__main__':
   main()
