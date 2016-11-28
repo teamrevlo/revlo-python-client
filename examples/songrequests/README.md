@@ -6,7 +6,9 @@ A sample project using Revlo's API to trigger Nightbot's !songs command.
 
 * Open your terminal or Powershell and clone the project
 ```
-git clone git://github.com/teamrevlo/revlo_client.git
+git clone git://github.com/teamrevlo/revlo-python-client.git
+cd revlo-python-client
+pip install -r requirements.txt
 ```
 * Retrieve your Revlo API Key by going to [Revlo](https://revlo.co) Dashboard > Settings > API Key
 * Find the reward\_id that belongs to your song request.
@@ -34,6 +36,6 @@ port=6667
 
 * In your Terminal/Powershell, enter this command
 ```
-cd revlo_client/examples/songrequests
+cd examples/songrequests
 python song_requests.py
 ```
