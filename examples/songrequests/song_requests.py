@@ -7,7 +7,7 @@ import os
 from configparser import ConfigParser
 from irc import Irc
 
-LAST_REWARD_REDEEMED_FILENAME = 'last_redemption_id.dat'
+LAST_REWARD_REDEEMED_FILENAME = './last_redemption_id.dat'
 
 def request_songs_to_nightbot(songs):
   if not songs:
@@ -20,32 +20,33 @@ def request_songs_to_nightbot(songs):
     time.sleep(3)
   irc.leave(twitch['channel'])
 
-def get_last_reward_redeemed():
+def get_last_redemption():
   with open(LAST_REWARD_REDEEMED_FILENAME) as f:
     try:
-      return int(f.read())
+      i = f.read()
+      return int(i)
     except:
       return 0
 
-def update_last_reward_redeemed(new_reward_id):
+def update_last_redemption(new_redemption_id):
   with open(LAST_REWARD_REDEEMED_FILENAME, 'w') as f:
-    f.write(new_reward_id)
+    f.write(str(new_redemption_id))
 
 def scan_song_redemptions(token, reward_id):
   client = RevloClient(api_key=token)
   results = []
-  last_reward_id = get_last_reward_redeemed()
+  last_redemption_id = get_last_redemption()
   for redemptions_batch in client.get_redemptions():
     for redemption in redemptions_batch:
       if redemption['reward_id'] == reward_id:
         if redemption['completed']:
           return results.reverse()
-        elif last_reward_id >= redemption['reward_id']:
+        elif last_redemption_id >= redemption['reward_id']:
           return results.reverse()
         elif not redemption['refunded']:
           results.append(redemption['user_input'])
-          last_reward_id = max(last_reward_id, redemption['reward_id'])
-          update_last_reward_redeemed(redemption['reward_id'])
+          last_redemption_id = max(last_redemption_id, redemption['redemption_id'])
+          update_last_redemption(last_redemption_id)
   return results.reverse()
 
 def main():
@@ -55,7 +56,7 @@ def main():
   revlo = config['revlo']
 
   token = revlo['api_key']
-  reward_id = revlo['reward_id']
+  reward_id = int(revlo['reward_id'])
   while True:
     songs = scan_song_redemptions(token, reward_id)
     request_songs_to_nightbot(songs)
