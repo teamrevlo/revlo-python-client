@@ -28,7 +28,7 @@ class RevloClient(object):
       response = requests.get("{}{}".format(API_BASE,endpoint), headers=self.headers)
       if response.ok:
         break
-      elif is400(response.status_code):
+      elif self._is400(response.status_code):
         handle_errors(self,response)
       sleep(min(2**i,10))
     if not response.ok:
@@ -41,7 +41,7 @@ class RevloClient(object):
       response = requests.post("{}{}".format(API_BASE, endpoint), headers=self.headers, data=payload)
       if response.ok:
         break
-      elif is400(response.status_code):
+      elif self._is400(response.status_code):
         handle_errors(self,response)
       sleep(min(2**i,10))
     if not response.ok:
