@@ -36,18 +36,29 @@ def song_request(redemption):
 
 def scan_song_redemptions(token, reward_id):
   client = RevloClient(api_key=token)
-  results = []
   last_redemption_id = get_last_redemption()
+  songs = []
+  ids = []
   for redemptions_batch in client.get_redemptions():
+    results = []
     for redemption in redemptions_batch:
-      if redeemable(redemption, last_redemption_id) and song_request(redemption):
-        results.append({"song": redemption['user_input']['song'], "id": redemption['redemption_id']})
-  ids = [x['id'] for x in results if x['id'] > last_redemption_id][::-1]
-  songs = [x['song'] for x in results if x['id'] > last_redemption_id][::-1]
+      if redeemable(redemption, last_redemption_id):
+        ids.append(redemption['redemption_id'])
+        if song_request(redemption):
+          results.append({"song": redemption['user_input']['song'], "id": redemption['redemption_id']})
+    songs.extend([x['song'] for x in results if x['id'] > last_redemption_id][::-1])
+    print(ids)
+    if ids:
+      if max(ids) > last_redemption_id:
+        last_redemption_id = max(ids)
+        update_last_redemption(last_redemption_id)
+        print("New songs found:{}".format(songs))
+        return songs
   if ids:
-    last_redemption_id = max(last_redemption_id, max(ids))
-    update_last_redemption(last_redemption_id)
-    print("New songs found:{}".format(songs))
+    if max(ids) > last_redemption_id:
+      last_redemption_id = max(ids)
+      update_last_redemption(last_redemption_id)
+      print("New songs found:{}".format(songs))
   return songs
 
 def main():
