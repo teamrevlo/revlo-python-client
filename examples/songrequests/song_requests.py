@@ -1,6 +1,5 @@
 import sys, os
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
-from revlo_client import RevloClient
+from revlo.client import RevloClient
 import socket
 import time
 import os
