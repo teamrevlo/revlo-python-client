@@ -3,3 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.ini
+dist
+.DS_Store
+build
