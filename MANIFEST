@@ -2,4 +2,4 @@
 setup.cfg
 setup.py
 revlo/__init__.py
-revlo/revlo.py
+revlo/client.py
