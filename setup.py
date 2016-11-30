@@ -9,5 +9,13 @@ setup(
   url = 'https://github.com/teamrevlo/revlo-python-client',
   download_url = 'https://github.com/teamrevlo/revlo-python-client/tarball/0.14',
   keywords = ['revlo-api', 'revlo', 'revloapi'],
-  classifiers = [],
+  classifiers = [
+    'License :: OSI Approved :: MIT License',
+    'Intended Audience :: Developers',
+    'Topic :: Software Development',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Programming Language :: Python :: 2.7',
+    'Programming Language :: Python :: 3.5'
+  ],
+  install_requires=['requests==2.9.1']
 )
