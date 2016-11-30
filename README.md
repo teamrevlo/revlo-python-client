@@ -4,7 +4,7 @@ Revlo API Python Client. See [RevloAPI](https://github.com/teamrevlo/RevloAPI) f
 
 ## Pre-requisites
 ```
-Python ≥ 3.5
+Python ≥ 2.7
 ```
 
 ## Installation
