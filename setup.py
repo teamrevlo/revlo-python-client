@@ -1,21 +1,25 @@
 from distutils.core import setup
+
+version='0.14.5'
+
 setup(
   name = 'revlo',
   packages = ['revlo'],
-  version = '0.14.1',
+  version = version,
   description = 'Revlo Python Client',
   author = 'Scott Nguyen',
   author_email = 'scott.q.nguyen@gmail.com',
   url = 'https://github.com/teamrevlo/revlo-python-client',
-  download_url = 'https://github.com/teamrevlo/revlo-python-client/tarball/0.14.1',
+  download_url = 'https://github.com/teamrevlo/revlo-python-client/tarball/{}'.format(version),
   keywords = ['revlo-api', 'revlo', 'revloapi'],
   classifiers = [
+    'Development Status :: 5 - Production/Stable',
     'License :: OSI Approved :: MIT License',
     'Intended Audience :: Developers',
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3.5'
+    'Programming Language :: Python :: 3.5',
   ],
-  install_requires=['requests==2.9.1']
+  license='MIT'
 )
