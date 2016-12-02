@@ -7,13 +7,13 @@ VERSION = 1
 API_BASE = 'https://api.revlo.co'
 MAX_RETRIES = 10
 
-class RevloClient(object):
+class RetryableHttpClient(object):
 
-  def __init__(self, api_key=""):
-    self.headers = {'content-type': 'application/json', \
-                    'x-api-key'   : api_key}
+  def __init__(self, http=requests,headers=None):
+    self.http = http
+    self.headers = headers
 
-  def handle_errors(self, response):
+  def _handle_errors(self, response):
     if response.status_code >= 500:
       raise RevloAPIServiceError("Something went wrong")
     else:
@@ -22,53 +22,75 @@ class RevloClient(object):
   def _is400(self, code):
     return code >= 400 and code < 500
 
-  def _get(self, endpoint):
-    response = None
-    for i in range(0,MAX_RETRIES):
-      response = requests.get("{}{}".format(API_BASE,endpoint), headers=self.headers)
-      if response.ok:
-        break
-      elif self._is400(response.status_code):
-        self.handle_errors(response)
-      sleep(min(2**i,10))
-    if not response.ok:
-      self.handle_errors(response)
-    return response.json()
+  def get(self, endpoint):
+    return self.request('GET', endpoint)
 
-  def _post(self, endpoint, payload):
+  def post(self, endpoint, payload):
+    return self._request('POST', endpoint, payload=payload)
+
+  def patch(self, endpoint, payload):
+    return self.request('PATCH', endpoint, payload=payload)
+
+  def delete(self, endpoint):
+    return self.request('DELETE', endpoint, payload=payload)
+
+  def request(self, request_type, endpoint, payload=None):
     response = None
     for i in range(0, MAX_RETRIES):
-      response = requests.post("{}{}".format(API_BASE, endpoint), headers=self.headers, data=payload)
+      response = self.http.request(request_type, endpoint, headers=self.headers, data=payload)
       if response.ok:
         break
       elif self._is400(response.status_code):
-        self.handle_errors(response)
+        self._handle_errors(response)
       sleep(min(2**i,10))
     if not response.ok:
-      self.handle_errors(response)
+      self._handle_errors(response)
     return response.json()
 
+class RevloClient(object):
+
+  def __init__(self, api_key="", base_url=API_BASE):
+    headers = {'content-type': 'application/json', \
+               'x-api-key'   : api_key}
+    self.base_url = base_url
+    self.http = RetryableHttpClient(requests, headers)
+
   def get_rewards(self):
-    response = self._get('/{}/rewards'.format(VERSION))
+    response = self._get('{}/{}/rewards'.format(self.base_url, VERSION))
     total = response['total']
     page_size = response['page_size']
     number_of_pages = int(ceil((total+0.0)/page_size))
-    p = 1
+    rewards = response['rewards']
+    for reward in rewards:
+      yield reward
+    p = 2
     while p <= number_of_pages:
-      redemptions = self._get('/{}/rewards?page={}'.format(VERSION, p))['rewards']
-      yield redemptions
+      rewards = self.get('{}/{}/rewards?page={}'.format(self.base_url, VERSION, p))['rewards']
+      for reward in rewards:
+        yield reward
       p += 1
 
-  def get_redemptions(self):
-    response = self._get('/{}/redemptions'.format(VERSION))
+  def get_redemptions(self, **kwargs):
+    endpoint = "{}/{}/redemptions?{}".format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]),kwargs.items())))
+    response = self.http.get(endpoint)
     total = response['total']
     page_size = response['page_size']
     number_of_pages = int(ceil((total+0.0)/page_size))
-    p = 1
+    redemptions = response['redemptions']
+    for redemption in redemptions:
+      yield redemption
+    p = 2
     while p <= number_of_pages:
-      redemptions = self._get('/{}/redemptions?page={}'.format(VERSION, p))['redemptions']
-      yield redemptions
+      redemptions = self.http.get(endpoint)['redemptions']
+      for redemption in redemptions:
+        yield redemption
       p += 1
+
+  def get_redemption(self, redemption_id):
+    return self.http.get('{}/{}/redemptions/{}'.format(self.base_url, VERSION, redemption_id))
+
+  def update_redemption(self, redemption_id, d):
+    return self.http.patch('{}/{}/redemptions/{}'.format(self.base_url, VERSION, redemption_id), json.dumps(d))
 
 class RevloAPIServiceError(IOError):
   pass
