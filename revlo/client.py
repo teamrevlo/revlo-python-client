@@ -65,12 +65,13 @@ class RevloClient(object):
       yield reward
     p = 2
     while p <= number_of_pages:
-      rewards = self.get('{}/{}/rewards?page={}'.format(self.base_url, VERSION, p))['rewards']
+      rewards = self.http.get('{}/{}/rewards?page={}'.format(self.base_url, VERSION, p))['rewards']
       for reward in rewards:
         yield reward
       p += 1
 
   def get_redemptions(self, **kwargs):
+    kwargs['page'] = 1
     endpoint = "{}/{}/redemptions?{}".format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]),kwargs.items())))
     response = self.http.get(endpoint)
     total = response['total']
@@ -81,6 +82,8 @@ class RevloClient(object):
       yield redemption
     p = 2
     while p <= number_of_pages:
+      kwargs['page'] = p
+      endpoint = "{}/{}/redemptions?{}".format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]),kwargs.items())))
       redemptions = self.http.get(endpoint)['redemptions']
       for redemption in redemptions:
         yield redemption
