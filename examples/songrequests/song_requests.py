@@ -3,7 +3,7 @@ from revlo.client import RevloClient
 import socket
 import time
 import os
-from configparser import ConfigParser
+import yaml
 from irc import Irc
 
 def request_songs_to_nightbot(irc, twitch, songs):
@@ -32,8 +32,8 @@ def scan_song_redemptions(token, reward_id):
   return songs
 
 def main():
-  config = ConfigParser()
-  config.read('config.ini')
+  lines = open('config.yml').read()
+  config = yaml.load(lines)
   twitch = config['twitch']
   revlo = config['revlo']
 
