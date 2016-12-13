@@ -11,4 +11,8 @@ Python ≥ 2.7
 
 ```
 pip install revlo
+
+or
+
+pip3.5 install revlo
 ```
