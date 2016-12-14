@@ -55,8 +55,8 @@ class RevloClient(object):
     self.base_url = base_url
     self.http = RetryableHttpClient(requests, headers)
 
-  def get_rewards(self):
-    response = self._get('{}/{}/rewards'.format(self.base_url, VERSION))
+  def get_rewards(self, **kwargs):
+    response = self.http.get('{}/{}/rewards?{}'.format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]),kwargs.items()))))
     total = response['total']
     page_size = response['page_size']
     number_of_pages = int(ceil((total+0.0)/page_size))
