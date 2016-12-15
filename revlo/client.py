@@ -56,7 +56,7 @@ class RevloClient(object):
     self.http = RetryableHttpClient(requests, headers)
 
   def get_rewards(self, **kwargs):
-    response = self.http.get('{}/{}/rewards?{}'.format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]),kwargs.items()))))
+    response = self.http.get('{}/{}/rewards?{}'.format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]), kwargs.items()))))
     total = response['total']
     page_size = response['page_size']
     number_of_pages = int(ceil((total+0.0)/page_size))
@@ -64,6 +64,11 @@ class RevloClient(object):
     for reward in rewards:
       yield reward
     p = 2
+    if 'page' in kwargs:
+      try:
+        p = max(2, int(kwargs['page']) + 1)
+      except ValueError:
+        pass
     while p <= number_of_pages:
       rewards = self.http.get('{}/{}/rewards?page={}'.format(self.base_url, VERSION, p))['rewards']
       for reward in rewards:
@@ -72,7 +77,7 @@ class RevloClient(object):
 
   def get_redemptions(self, **kwargs):
     kwargs['page'] = 1
-    endpoint = "{}/{}/redemptions?{}".format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]),kwargs.items())))
+    endpoint = "{}/{}/redemptions?{}".format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]), kwargs.items())))
     response = self.http.get(endpoint)
     total = response['total']
     page_size = response['page_size']
@@ -81,6 +86,11 @@ class RevloClient(object):
     for redemption in redemptions:
       yield redemption
     p = 2
+    if 'page' in kwargs:
+      try:
+        p = max(2, int(kwargs['page']) + 1)
+      except ValueError:
+        pass
     while p <= number_of_pages:
       kwargs['page'] = p
       endpoint = "{}/{}/redemptions?{}".format(self.base_url, VERSION, "&".join(map(lambda a: "{}={}".format(a[0],a[1]),kwargs.items())))
