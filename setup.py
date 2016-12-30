@@ -1,6 +1,6 @@
-from distutils.core import setup
+from setuptools import setup
 
-version='0.15.3'
+version='0.15.4'
 
 setup(
   name = 'revlo',
@@ -21,5 +21,6 @@ setup(
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.5',
   ],
-  license='MIT'
+  license='MIT',
+  install_requires=['requests']
 )
