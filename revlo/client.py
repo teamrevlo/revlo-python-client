@@ -26,7 +26,7 @@ class RetryableHttpClient(object):
     return self.request('GET', endpoint)
 
   def post(self, endpoint, payload):
-    return self._request('POST', endpoint, payload=payload)
+    return self.request('POST', endpoint, payload=payload)
 
   def patch(self, endpoint, payload):
     return self.request('PATCH', endpoint, payload=payload)
@@ -104,6 +104,12 @@ class RevloClient(object):
 
   def update_redemption(self, redemption_id, d):
     return self.http.patch('{}/{}/redemptions/{}'.format(self.base_url, VERSION, redemption_id), json.dumps(d))
+
+  def get_loyalty(self, username):
+    return self.http.get('{}/{}/fans/{}/points'.format(self.base_url, VERSION, username))
+
+  def bonus(self, username, amount):
+    return self.http.post('{}/{}/fans/{}/points/bonus'.format(self.base_url, VERSION, username), json.dumps({'amount': amount}))
 
 class RevloAPIServiceError(IOError):
   pass
