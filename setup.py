@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version='0.15.4'
+version='0.15.5'
 
 setup(
   name = 'revlo',
