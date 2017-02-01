@@ -1,6 +1,6 @@
 from setuptools import setup
 
-version='0.15.5'
+version='0.15.6'
 
 setup(
   name = 'revlo',
@@ -22,5 +22,5 @@ setup(
     'Programming Language :: Python :: 3.5',
   ],
   license='MIT',
-  install_requires=['requests']
+  install_requires=['requests', 'PyYAML']
 )
