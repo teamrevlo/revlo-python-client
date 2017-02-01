@@ -1,8 +1,8 @@
-- revlo:
+revlo:
   api_key: REVLO_API_KEY
   reward_id: 2
 
-- twitch:
+twitch:
   password: oauth:OAUTH_TOKEN
   channel: TWITCH_CHANNEL
   username: TWITCH_CHANNEL
